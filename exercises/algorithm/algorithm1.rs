@@ -2,11 +2,9 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
-use std::vec::*;
 
 #[derive(Debug)]
 struct Node<T> {
@@ -69,17 +67,46 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
-        }
-	}
+	
 }
 
+impl <T : std::cmp::PartialOrd + Copy >  LinkedList<T> {
+    pub fn merge(mut list_a:LinkedList<T>,mut list_b:LinkedList<T>) -> Self
+	{
+		let mut res: LinkedList<T> = LinkedList::new();
+        let mut a = list_a.start;
+        let mut b = list_b.start;
+        while a.is_some() && b.is_some() {
+            let va = list_a.get_ith_node(a, 0).unwrap();
+            let vb = list_b.get_ith_node(b, 0).unwrap();
+            if va < vb {
+                res.add(*va);
+                a = unsafe {
+                    (*(a.unwrap()).as_ptr()).next
+                };
+            }else {
+                res.add(*vb);
+                b = unsafe {
+                    (*(b.unwrap()).as_ptr()).next
+                };
+            }
+        }
+        while a.is_some() {
+            res.add(*list_a.get_ith_node(a, 0).unwrap());
+            a = unsafe {
+                (*(a.unwrap()).as_ptr()).next
+            };
+        }
+        while b.is_some() {
+            res.add(*list_b.get_ith_node(b, 0).unwrap());
+            b = unsafe {
+                (*(b.unwrap()).as_ptr()).next
+            };
+        }
+        
+		res
+	}
+}
 impl<T> Display for LinkedList<T>
 where
     T: Display,
